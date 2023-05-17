@@ -158,6 +158,8 @@ def main():
                 most_common_fg_id = Counter(
                     finger_gesture_history).most_common()
 
+                print(hand_sign_id)
+
                 # Drawing part
                 debug_image = draw_bounding_rect(use_brect, debug_image, brect)
                 debug_image = draw_landmarks(debug_image, landmark_list)
