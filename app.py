@@ -15,6 +15,13 @@ from utils import CvFpsCalc
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
+import socket
+import os
+import time
+
+SOCKET_HOST = "localhost"
+SOCKET_PORT = 12345
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -159,6 +166,7 @@ def main():
                     finger_gesture_history).most_common()
 
                 print(hand_sign_id)
+                server_socket.sendto(int(hand_sign_id).to_bytes(4, byteorder="big"), (SOCKET_HOST, SOCKET_PORT))
 
                 # Drawing part
                 debug_image = draw_bounding_rect(use_brect, debug_image, brect)
@@ -543,3 +551,4 @@ def draw_info(image, fps, mode, number):
 
 if __name__ == '__main__':
     main()
+    server_socket.close()
