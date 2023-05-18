@@ -10,6 +10,7 @@ from collections import deque
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
+import json
 
 from utils import CvFpsCalc
 from model import KeyPointClassifier
@@ -165,8 +166,18 @@ def main():
                 most_common_fg_id = Counter(
                     finger_gesture_history).most_common()
 
-                print(hand_sign_id)
-                server_socket.sendto(int(hand_sign_id).to_bytes(4, byteorder="big"), (SOCKET_HOST, SOCKET_PORT))
+                image_width, image_height = image.shape[1], image.shape[0]
+                data = {
+                    "sign_id": int(hand_sign_id),
+                    "finger_gest_id": int(finger_gesture_id),
+                    "hand_id": handedness.classification[0].index,
+                    "pointer": [landmark_list[8][0] / image_width - 0.5,
+                                landmark_list[8][1] / image_height - 0.5],
+                    "num_hands": len(results.multi_handedness)
+                }
+                data = json.dumps(data)
+                #print(data)
+                server_socket.sendto(data.encode("utf-8"),(SOCKET_HOST, SOCKET_PORT))
 
                 # Drawing part
                 debug_image = draw_bounding_rect(use_brect, debug_image, brect)
